@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: secureweb-labs
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app
+    envVars:
+      - key: DISCORD_WEBHOOK_URL
+        sync: false
