@@ -1,0 +1,988 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="SecureWeb Labs provides website security assessments for businesses. Identify common web vulnerabilities, receive a clear report, and get practical remediation guidance." />
+  <meta name="robots" content="index,follow" />
+  <meta name="theme-color" content="#050b14" />
+  <title>Website Security Assessment | SecureWeb Labs</title>
+
+  <!--
+    GOOGLE ADS / ANALYTICS:
+    After creating your Google Ads conversion action, paste the Google tag here.
+    Then replace the placeholder conversion ID/label in the form submit handler below.
+
+    Example:
+    <script async src="https://www.googletagmanager.com/gtag/js?id=AW-XXXXXXXXX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'AW-XXXXXXXXX');
+    </script>
+  -->
+
+  <style>
+    :root {
+      --bg: #050b14;
+      --bg-soft: #08111e;
+      --card: rgba(10, 25, 42, 0.72);
+      --card-strong: #0b1929;
+      --line: rgba(125, 183, 235, 0.16);
+      --text: #f5f8fc;
+      --muted: #9eafc2;
+      --blue: #168cff;
+      --blue-2: #56b4ff;
+      --cyan: #35d5d2;
+      --danger: #ff6b81;
+      --max: 1160px;
+      --radius: 20px;
+      --shadow: 0 25px 70px rgba(0, 0, 0, .35);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+        "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at 75% 10%, rgba(22,140,255,.13), transparent 30%),
+        radial-gradient(circle at 10% 35%, rgba(53,213,210,.06), transparent 25%),
+        var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: .28;
+      background-image:
+        linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);
+      background-size: 60px 60px;
+      mask-image: linear-gradient(to bottom, black, transparent 70%);
+    }
+
+    a { color: inherit; text-decoration: none; }
+    button, input, textarea { font: inherit; }
+
+    .container {
+      width: min(calc(100% - 40px), var(--max));
+      margin-inline: auto;
+    }
+
+    .nav {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      backdrop-filter: blur(18px);
+      background: rgba(5, 11, 20, .78);
+      border-bottom: 1px solid rgba(255,255,255,.06);
+    }
+
+    .nav-inner {
+      min-height: 74px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      font-weight: 800;
+      letter-spacing: -.03em;
+      white-space: nowrap;
+    }
+
+    .brand-mark {
+      width: 38px;
+      height: 38px;
+      border: 1px solid rgba(86,180,255,.55);
+      border-radius: 12px;
+      display: grid;
+      place-items: center;
+      color: var(--blue-2);
+      background: rgba(22,140,255,.08);
+      box-shadow: 0 0 30px rgba(22,140,255,.15);
+    }
+
+    .brand span span { color: var(--blue-2); }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 28px;
+      color: #b9c7d6;
+      font-size: .92rem;
+    }
+
+    .nav-links a:hover { color: white; }
+
+    .btn {
+      border: 0;
+      cursor: pointer;
+      border-radius: 12px;
+      padding: 13px 19px;
+      font-weight: 750;
+      transition: .2s ease;
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      gap: 9px;
+    }
+
+    .btn-primary {
+      color: white;
+      background: linear-gradient(135deg, #087cf0, #1b9cff);
+      box-shadow: 0 10px 30px rgba(22,140,255,.25);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 14px 36px rgba(22,140,255,.35);
+    }
+
+    .btn-secondary {
+      color: white;
+      background: rgba(255,255,255,.035);
+      border: 1px solid rgba(255,255,255,.15);
+    }
+
+    .btn-secondary:hover { background: rgba(255,255,255,.07); }
+
+    .hero {
+      padding: 92px 0 70px;
+      overflow: hidden;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.05fr .95fr;
+      gap: 70px;
+      align-items: center;
+    }
+
+    .eyebrow, .section-kicker {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      color: #bcd2e8;
+      text-transform: uppercase;
+      letter-spacing: .14em;
+      font-size: .73rem;
+      font-weight: 800;
+    }
+
+    .eyebrow::before {
+      content: "";
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #21d7aa;
+      box-shadow: 0 0 14px #21d7aa;
+    }
+
+    h1 {
+      font-size: clamp(3rem, 6.4vw, 5.6rem);
+      line-height: .98;
+      letter-spacing: -.065em;
+      margin: 20px 0 24px;
+      max-width: 800px;
+    }
+
+    .gradient {
+      background: linear-gradient(100deg, #fff 10%, #55b6ff 75%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .hero-copy {
+      font-size: 1.15rem;
+      color: var(--muted);
+      max-width: 650px;
+      margin-bottom: 30px;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .trust-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 18px 28px;
+      margin-top: 30px;
+      color: #b7c6d6;
+      font-size: .86rem;
+    }
+
+    .trust-row span::before {
+      content: "✓";
+      color: #57baff;
+      margin-right: 8px;
+      font-weight: 900;
+    }
+
+    .scan-card {
+      position: relative;
+      min-height: 440px;
+      display: grid;
+      place-items: center;
+    }
+
+    .scan-glow {
+      position: absolute;
+      width: 320px;
+      height: 320px;
+      border-radius: 50%;
+      background: rgba(22,140,255,.17);
+      filter: blur(65px);
+    }
+
+    .dashboard {
+      position: relative;
+      width: min(100%, 510px);
+      border: 1px solid rgba(105,183,255,.25);
+      background: linear-gradient(145deg, rgba(17,37,60,.86), rgba(5,13,23,.9));
+      border-radius: 24px;
+      box-shadow: var(--shadow), inset 0 1px rgba(255,255,255,.07);
+      padding: 17px;
+      transform: perspective(900px) rotateY(-5deg) rotateX(2deg);
+    }
+
+    .window-top {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .dot { width: 8px; height: 8px; border-radius: 50%; background: #587086; }
+    .window-title { margin-left: auto; color: #7e91a5; font-size: .72rem; }
+
+    .security-screen {
+      padding: 32px 22px 22px;
+      min-height: 330px;
+    }
+
+    .shield {
+      width: 90px;
+      height: 90px;
+      margin: 0 auto 20px;
+      border: 1px solid rgba(77,185,255,.45);
+      border-radius: 28px;
+      display: grid;
+      place-items: center;
+      color: #56b8ff;
+      background: rgba(22,140,255,.08);
+      box-shadow: 0 0 50px rgba(22,140,255,.16);
+      font-size: 42px;
+    }
+
+    .scan-status {
+      text-align: center;
+      font-weight: 800;
+      font-size: 1.08rem;
+    }
+
+    .scan-sub {
+      text-align: center;
+      color: #8195a9;
+      font-size: .8rem;
+      margin-top: 5px;
+    }
+
+    .progress {
+      height: 8px;
+      background: #122338;
+      border-radius: 99px;
+      overflow: hidden;
+      margin: 24px 0 22px;
+    }
+
+    .progress > div {
+      height: 100%;
+      width: 72%;
+      background: linear-gradient(90deg, #087cf0, #38d7d0);
+      border-radius: inherit;
+    }
+
+    .finding-list {
+      display: grid;
+      gap: 9px;
+    }
+
+    .finding {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 12px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      color: #b9c9d9;
+      font-size: .79rem;
+    }
+
+    .finding b {
+      font-size: .7rem;
+      color: #58c8a5;
+      font-weight: 800;
+    }
+
+    .standards {
+      border-top: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+      background: rgba(10, 25, 42, .5);
+      padding: 24px 0;
+    }
+
+    .standards-inner {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 30px;
+      color: #7f93a8;
+      font-size: .8rem;
+      text-transform: uppercase;
+      letter-spacing: .1em;
+    }
+
+    .standard-items {
+      display: flex;
+      gap: 30px;
+      align-items: center;
+      flex-wrap: wrap;
+      color: #b9c7d6;
+      font-weight: 800;
+      letter-spacing: .02em;
+    }
+
+    section { padding: 95px 0; }
+
+    .section-heading {
+      max-width: 720px;
+      margin-bottom: 48px;
+    }
+
+    .section-heading h2 {
+      font-size: clamp(2rem, 4vw, 3.3rem);
+      letter-spacing: -.045em;
+      line-height: 1.05;
+      margin: 12px 0;
+    }
+
+    .section-heading p {
+      color: var(--muted);
+      margin: 0;
+      font-size: 1.02rem;
+    }
+
+    .center { text-align: center; margin-inline: auto; }
+
+    .services {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+
+    .card {
+      border: 1px solid var(--line);
+      background: linear-gradient(145deg, rgba(10,27,45,.78), rgba(6,16,27,.72));
+      border-radius: var(--radius);
+      padding: 27px;
+      box-shadow: inset 0 1px rgba(255,255,255,.025);
+    }
+
+    .card:hover {
+      border-color: rgba(86,180,255,.3);
+    }
+
+    .icon {
+      width: 46px;
+      height: 46px;
+      border-radius: 13px;
+      display: grid;
+      place-items: center;
+      color: #58baff;
+      background: rgba(22,140,255,.09);
+      border: 1px solid rgba(86,180,255,.14);
+      margin-bottom: 22px;
+      font-size: 1.25rem;
+    }
+
+    .card h3 { margin: 0 0 9px; font-size: 1.08rem; }
+    .card p { margin: 0; color: var(--muted); font-size: .9rem; }
+
+    .process {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+    }
+
+    .step { position: relative; }
+    .step-number {
+      color: #55b6ff;
+      font-weight: 900;
+      font-size: .78rem;
+      letter-spacing: .12em;
+    }
+    .step h3 { margin: 9px 0 7px; }
+    .step p { color: var(--muted); font-size: .9rem; margin: 0; }
+
+    .split {
+      display: grid;
+      grid-template-columns: .9fr 1.1fr;
+      gap: 70px;
+      align-items: start;
+    }
+
+    .benefits {
+      display: grid;
+      gap: 15px;
+    }
+
+    .benefit {
+      display: grid;
+      grid-template-columns: 45px 1fr;
+      gap: 15px;
+      align-items: start;
+    }
+
+    .benefit .icon { margin: 0; width: 42px; height: 42px; }
+    .benefit h3 { margin: 0 0 4px; font-size: .98rem; }
+    .benefit p { margin: 0; color: var(--muted); font-size: .88rem; }
+
+    .form-card {
+      border: 1px solid rgba(86,180,255,.23);
+      background: linear-gradient(145deg, rgba(12,34,57,.8), rgba(5,15,25,.92));
+      border-radius: 24px;
+      padding: 32px;
+      box-shadow: var(--shadow);
+    }
+
+    .form-card h2 { margin: 0 0 8px; font-size: 1.7rem; }
+    .form-card > p { margin: 0 0 24px; color: var(--muted); }
+
+    .form-grid {
+      display: grid;
+      gap: 13px;
+    }
+
+    label {
+      font-size: .78rem;
+      font-weight: 750;
+      color: #bdcddd;
+      display: grid;
+      gap: 7px;
+    }
+
+    input, textarea {
+      width: 100%;
+      border: 1px solid rgba(129,178,220,.17);
+      background: rgba(3,10,18,.58);
+      color: white;
+      outline: none;
+      border-radius: 11px;
+      padding: 13px 14px;
+      transition: .2s;
+    }
+
+    input:focus, textarea:focus {
+      border-color: rgba(40,155,255,.7);
+      box-shadow: 0 0 0 3px rgba(22,140,255,.1);
+    }
+
+    textarea { min-height: 110px; resize: vertical; }
+
+    .form-note {
+      color: #71869a;
+      font-size: .72rem;
+      margin-top: 12px;
+      text-align: center;
+    }
+
+    .success {
+      display: none;
+      padding: 16px;
+      border: 1px solid rgba(41,210,169,.25);
+      background: rgba(41,210,169,.07);
+      color: #9ee8d2;
+      border-radius: 12px;
+      margin-top: 15px;
+      font-size: .9rem;
+    }
+
+    .faq {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    details {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: rgba(8,22,37,.55);
+      padding: 17px 18px;
+    }
+
+    summary {
+      cursor: pointer;
+      font-weight: 700;
+      font-size: .9rem;
+      list-style: none;
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    summary::after { content: "+"; color: #62bfff; font-size: 1.1rem; }
+    details[open] summary::after { content: "−"; }
+    details p { color: var(--muted); font-size: .85rem; margin: 13px 0 0; }
+
+    .disclaimer {
+      margin-top: 22px;
+      padding: 14px 16px;
+      border-left: 2px solid #277fc3;
+      background: rgba(22,140,255,.045);
+      color: #8298ad;
+      font-size: .76rem;
+      border-radius: 0 10px 10px 0;
+    }
+
+    footer {
+      border-top: 1px solid var(--line);
+      padding: 30px 0;
+      color: #7e91a5;
+      font-size: .8rem;
+    }
+
+    .footer-inner {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .footer-links { display: flex; gap: 18px; }
+
+    @media (max-width: 900px) {
+      .hero-grid, .split { grid-template-columns: 1fr; }
+      .hero { padding-top: 65px; }
+      .scan-card { min-height: 350px; }
+      .services { grid-template-columns: repeat(2, 1fr); }
+      .process { grid-template-columns: repeat(2, 1fr); }
+      .nav-links { display: none; }
+    }
+
+    @media (max-width: 620px) {
+      .container { width: min(calc(100% - 28px), var(--max)); }
+      .hero { padding: 55px 0 45px; }
+      h1 { font-size: 3.25rem; }
+      section { padding: 68px 0; }
+      .services, .process, .faq { grid-template-columns: 1fr; }
+      .standards-inner { align-items: flex-start; flex-direction: column; }
+      .standard-items { gap: 15px; }
+      .form-card { padding: 22px; }
+      .footer-inner { align-items: flex-start; flex-direction: column; }
+      .desktop-cta { display: none; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      * { transition: none !important; }
+    }
+  </style>
+</head>
+
+<body>
+  <header class="nav">
+    <div class="container nav-inner">
+      <a href="#top" class="brand" aria-label="SecureWeb Labs home">
+        <div class="brand-mark" aria-hidden="true">⌁</div>
+        <span>SecureWeb<span>Labs</span></span>
+      </a>
+
+      <nav class="nav-links" aria-label="Main navigation">
+        <a href="#services">Services</a>
+        <a href="#process">Process</a>
+        <a href="#why-us">Why Us</a>
+        <a href="#faq">FAQ</a>
+      </nav>
+
+      <a class="btn btn-primary desktop-cta" href="#assessment">Get Assessment</a>
+    </div>
+  </header>
+
+  <main id="top">
+    <section class="hero">
+      <div class="container hero-grid">
+        <div>
+          <div class="eyebrow">Website Security Assessment</div>
+
+          <h1>
+            Is your website
+            <span class="gradient">really secure?</span>
+          </h1>
+
+          <p class="hero-copy">
+            Identify common security weaknesses before they become business problems.
+            SecureWeb Labs provides clear, practical website and web application security
+            assessments for businesses.
+          </p>
+
+          <div class="hero-actions">
+            <a class="btn btn-primary" href="#assessment">Request Security Assessment →</a>
+            <a class="btn btn-secondary" href="#services">Explore Services</a>
+          </div>
+
+          <div class="trust-row" aria-label="Service benefits">
+            <span>Clear findings</span>
+            <span>Actionable recommendations</span>
+            <span>Business-focused reporting</span>
+          </div>
+        </div>
+
+        <div class="scan-card" aria-hidden="true">
+          <div class="scan-glow"></div>
+          <div class="dashboard">
+            <div class="window-top">
+              <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+              <span class="window-title">security-assessment</span>
+            </div>
+            <div class="security-screen">
+              <div class="shield">⌾</div>
+              <div class="scan-status">Website Security Assessment</div>
+              <div class="scan-sub">Analyzing security controls and common risks</div>
+              <div class="progress"><div></div></div>
+              <div class="finding-list">
+                <div class="finding"><span>Authentication</span><b>REVIEW</b></div>
+                <div class="finding"><span>Input validation</span><b>REVIEW</b></div>
+                <div class="finding"><span>Security headers</span><b>REVIEW</b></div>
+                <div class="finding"><span>Configuration</span><b>REVIEW</b></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="standards">
+      <div class="container standards-inner">
+        <span>Structured security practices</span>
+        <div class="standard-items">
+          <span>OWASP</span>
+          <span>NIST</span>
+          <span>CWE</span>
+          <span>Web Security</span>
+        </div>
+      </div>
+    </div>
+
+    <section id="services">
+      <div class="container">
+        <div class="section-heading center">
+          <div class="section-kicker">Our services</div>
+          <h2>Security assessment built for real websites.</h2>
+          <p>
+            We focus on practical findings that help a business understand its exposure
+            and decide what to fix first.
+          </p>
+        </div>
+
+        <div class="services">
+          <article class="card">
+            <div class="icon">⌕</div>
+            <h3>Vulnerability Assessment</h3>
+            <p>Review a website or web application for common security weaknesses and risky behavior.</p>
+          </article>
+
+          <article class="card">
+            <div class="icon">▣</div>
+            <h3>Authentication Review</h3>
+            <p>Review login flows, session handling, access controls, and common authentication risks.</p>
+          </article>
+
+          <article class="card">
+            <div class="icon">&lt;/&gt;</div>
+            <h3>Application Security</h3>
+            <p>Assess areas such as input handling, injection risks, XSS exposure, and access control.</p>
+          </article>
+
+          <article class="card">
+            <div class="icon">⚙</div>
+            <h3>Security Configuration</h3>
+            <p>Review relevant security headers, exposed services, configuration choices, and misconfigurations.</p>
+          </article>
+
+          <article class="card">
+            <div class="icon">▤</div>
+            <h3>Security Report</h3>
+            <p>Receive findings explained in plain language with severity context and practical remediation guidance.</p>
+          </article>
+
+          <article class="card">
+            <div class="icon">✓</div>
+            <h3>Remediation Guidance</h3>
+            <p>Understand what should be addressed, why it matters, and where your development team can start.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="process">
+      <div class="container">
+        <div class="section-heading center">
+          <div class="section-kicker">How it works</div>
+          <h2>Simple process. Clear results.</h2>
+          <p>From initial scope to a useful security report, without unnecessary complexity.</p>
+        </div>
+
+        <div class="process">
+          <article class="card step">
+            <div class="step-number">01</div>
+            <h3>Tell us about your website</h3>
+            <p>Share your website URL, goals, and the areas you want assessed.</p>
+          </article>
+
+          <article class="card step">
+            <div class="step-number">02</div>
+            <h3>Define the scope</h3>
+            <p>We confirm authorization, scope, testing boundaries, and expectations before testing begins.</p>
+          </article>
+
+          <article class="card step">
+            <div class="step-number">03</div>
+            <h3>Assess security</h3>
+            <p>We review the agreed areas for common vulnerabilities and security weaknesses.</p>
+          </article>
+
+          <article class="card step">
+            <div class="step-number">04</div>
+            <h3>Receive the report</h3>
+            <p>Get documented findings, explanations, and practical recommendations for remediation.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="why-us">
+      <div class="container split">
+        <div>
+          <div class="section-kicker">Why SecureWeb Labs</div>
+          <h2 style="font-size:clamp(2.2rem,4vw,3.4rem);line-height:1.05;letter-spacing:-.045em;">
+            More than just a scan.
+          </h2>
+          <p style="color:var(--muted);max-width:580px;">
+            A useful assessment should help you understand risk, communicate findings,
+            and decide what to fix—not simply produce a list of technical terms.
+          </p>
+
+          <div class="disclaimer">
+            Security testing is performed only with explicit authorization and within an agreed scope.
+          </div>
+        </div>
+
+        <div class="benefits">
+          <div class="benefit">
+            <div class="icon">◈</div>
+            <div>
+              <h3>Security-focused assessment</h3>
+              <p>Assessment areas are selected around your website and agreed testing scope.</p>
+            </div>
+          </div>
+
+          <div class="benefit">
+            <div class="icon">◌</div>
+            <div>
+              <h3>Clear communication</h3>
+              <p>Technical findings are explained in language that business and development teams can use.</p>
+            </div>
+          </div>
+
+          <div class="benefit">
+            <div class="icon">↗</div>
+            <div>
+              <h3>Actionable recommendations</h3>
+              <p>Understand which issues deserve attention and what remediation can look like.</p>
+            </div>
+          </div>
+
+          <div class="benefit">
+            <div class="icon">✓</div>
+            <div>
+              <h3>Respect for scope</h3>
+              <p>Testing is conducted only against assets you are authorized to have assessed.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="assessment">
+      <div class="container split">
+        <div>
+          <div class="section-kicker">Take the first step</div>
+          <h2 style="font-size:clamp(2.2rem,4vw,3.4rem);line-height:1.05;letter-spacing:-.045em;">
+            Find out where your website stands.
+          </h2>
+          <p style="color:var(--muted);max-width:560px;">
+            Tell us a little about your website and what you want assessed.
+            We'll use this information to understand your requirements.
+          </p>
+          <div class="trust-row">
+            <span>Authorized testing only</span>
+            <span>Clear scope</span>
+            <span>Confidential handling</span>
+          </div>
+        </div>
+
+        <div class="form-card">
+          <h2>Request a Security Assessment</h2>
+          <p>Submit your details and we'll get back to you about the next step.</p>
+
+          <!-- Replace this demo handler with your Render backend / form provider before launch. -->
+          <form id="assessmentForm" class="form-grid" novalidate>
+            <label>
+              Your name
+              <input name="name" type="text" autocomplete="name" placeholder="John Doe" required />
+            </label>
+
+            <label>
+              Business email
+              <input name="email" type="email" autocomplete="email" placeholder="you@company.com" required />
+            </label>
+
+            <label>
+              Website URL
+              <input name="website" type="url" inputmode="url" placeholder="https://example.com" required />
+            </label>
+
+            <label>
+              What would you like assessed?
+              <textarea name="message" placeholder="Tell us about your website or security concerns (optional)."></textarea>
+            </label>
+
+            <button class="btn btn-primary" type="submit">Send Assessment Request →</button>
+          </form>
+
+          <div id="successMessage" class="success" role="status">
+            Thanks. Your request has been captured in this demo. Connect this form to your backend or form provider before using it for real leads.
+          </div>
+
+          <div class="form-note">We only test systems with explicit authorization.</div>
+        </div>
+      </div>
+    </section>
+
+    <section id="faq">
+      <div class="container">
+        <div class="section-heading center">
+          <div class="section-kicker">FAQ</div>
+          <h2>Questions? We've got answers.</h2>
+          <p>Important information before requesting an assessment.</p>
+        </div>
+
+        <div class="faq">
+          <details>
+            <summary>What types of websites can be assessed?</summary>
+            <p>Websites and web applications can be assessed when the owner or authorized party has approved the testing and the scope is clearly defined.</p>
+          </details>
+
+          <details>
+            <summary>What will I receive?</summary>
+            <p>A report can document identified findings, relevant evidence, risk context, and practical remediation recommendations based on the agreed scope.</p>
+          </details>
+
+          <details>
+            <summary>How long does an assessment take?</summary>
+            <p>Timing depends on the size and complexity of the application and the agreed scope. The schedule should be confirmed before testing begins.</p>
+          </details>
+
+          <details>
+            <summary>Will testing take my website offline?</summary>
+            <p>Testing should be scoped to minimize unnecessary disruption. Production testing requires explicit authorization and appropriate safeguards.</p>
+          </details>
+
+          <details>
+            <summary>Do you fix vulnerabilities?</summary>
+            <p>The assessment can include remediation guidance. If implementation support is offered, it should be agreed separately with the client.</p>
+          </details>
+
+          <details>
+            <summary>Do you test websites without permission?</summary>
+            <p>No. Security testing should only be performed against systems for which you have explicit authorization.</p>
+          </details>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container footer-inner">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">⌁</div>
+        <span>SecureWeb<span>Labs</span></span>
+      </div>
+
+      <div class="footer-links">
+        <a href="#services">Services</a>
+        <a href="#faq">FAQ</a>
+        <a href="#assessment">Contact</a>
+      </div>
+
+      <span>© 2026 SecureWeb Labs. Demo project.</span>
+    </div>
+  </footer>
+
+  <script>
+    const form = document.getElementById("assessmentForm");
+    const success = document.getElementById("successMessage");
+
+    form.addEventListener("submit", function (event) {
+      event.preventDefault();
+
+      if (!form.checkValidity()) {
+        form.reportValidity();
+        return;
+      }
+
+      /*
+        GOOGLE ADS CONVERSION TRACKING:
+        After installing your Google tag, replace the placeholder below.
+
+        Example:
+        gtag('event', 'conversion', {
+          'send_to': 'AW-XXXXXXXXX/XXXXXXXXXXXX'
+        });
+
+        Also consider tracking the form_submit event in GA4.
+      */
+
+      // Demo behavior until a real backend/form endpoint is connected.
+      const submitButton = form.querySelector("button[type='submit']");
+      submitButton.disabled = true;
+      submitButton.textContent = "Request Received ✓";
+      success.style.display = "block";
+
+      // In production, send the FormData to your Render backend here.
+      // Example:
+      // fetch("/api/assessment", { method: "POST", body: new FormData(form) });
+
+      form.reset();
+    });
+  </script>
+</body>
+</html>
